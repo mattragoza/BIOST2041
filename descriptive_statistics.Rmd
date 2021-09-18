@@ -1,30 +1,197 @@
 ---
-title: "descriptive_statistics"
+title: "M2 Data Analysis: Descriptive Statistics"
 author: "Matthew Ragoza"
 date: "9/18/2021"
-output: html_document
+output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
+library('ggplot2')
+library('dplyr')
+library('tidyverse')
+library('knitr')
+library('janitor')
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Obstetrics and Periodontal Therapy (OPT) study dataset
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+load('OPT.RData')
 ```
 
-## Including Plots
+### Treatment group
 
-You can also embed plots, for example:
+Treatment group is categorical, so its distribution is shown in Figure 1 as a bar chart, and the frequency and relative frequency of each treatment group category are listed in Table 1. As expected based on the study description, there were 410 pregnant individuals in the control group (49.8%) and 413 in the treatment group (50.2%), amounting to a total of N=823.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+ggplot(opt %>%
+    drop_na(Group),
+    aes(x=Group)
+) + geom_bar() + theme_classic() + ylab('Count') +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, NA))
+```
+Figure 1. Visualization of treatment group
+
+```{r}
+kable(opt %>%
+    group_by(Group) %>%
+    summarize(Count=n()) %>%
+    mutate(Percent=Count/sum(Count)*100) %>%
+    adorn_totals()
+)
+```
+Table 1. Numerical summary of treatment group
+
+### Infant birthweight
+
+The next variable of interest was infant birthweight in grams, which is quantitative. Therefore, it is visualized in Figure 2 as a histogram and numerically summarized in Table 2 using measures of center and spread. The distribution of birthweight is unimodal, and the fact that the mean (3248) is less than the median (3280) suggests that the distribution could be left-skewed. This is also supported by the longer left tail than right tail seen in Figure 2. As such, the median is a better estimate of central tendency than the mean, which is biased towards the low outliers. Furhermore, the standard deviation is 580 and the IQR is 595.
+```{r}
+ggplot(opt %>%
+    drop_na(Birthweight),
+    aes(x=Birthweight)
+) + geom_histogram() + theme_classic() + xlab('Birthweight (g)') + ylab('Count')
+```
+Figure 2. Visualization of infant birthweight
+
+```{r}
+kable(opt %>%
+    summarize(
+        N=n(),
+        N_NA=sum(is.na(Birthweight)),
+        Mean=mean(Birthweight, na.rm=TRUE),
+        SD=sd(Birthweight, na.rm=TRUE),
+        Min=min(Birthweight, na.rm=TRUE),
+        Pct_25=quantile(Birthweight, 0.25, na.rm=TRUE),
+        Median=median(Birthweight, na.rm=TRUE),
+        Pct_75=quantile(Birthweight, 0.75, na.rm=TRUE),
+        Max=max(Birthweight, na.rm=TRUE),
+        IQR=quantile(Birthweight, 0.75, na.rm=TRUE)-quantile(Birthweight, 0.25, na.rm=TRUE),
+        Range=max(Birthweight, na.rm=TRUE)-min(Birthweight, na.rm=TRUE),
+    )
+)
+```
+Table 2. Numerical summary of infant birthweight
+
+### Age of pregnant individual at baseline
+
+Next we examine the age of the pregnant individual in years at baseline. This variable is also quantitative, so its distribution is seen in Figure 3 as a histogram and summarized in Table 3 using measures of center and spread. This time, viewing the shape in Figure 3 reveals a unimodal right-skewed distribution, which is also indicated by the mean (26) being greater than the median (25). In addition, the standard deviation of birthweight is 5.6 and the IQR is 8.
+
+```{r}
+ggplot(opt %>%
+    drop_na(Age),
+    aes(x=Age)
+) + geom_histogram() + theme_classic() + xlab('Age (years)') + ylab('Count')
+```
+Figure 3. Visualization of age of pregnant individual at baseline
+
+```{r}
+kable(opt %>%
+    summarize(
+        N=n(),
+        Mean=mean(Age, na.rm=TRUE),
+        SD=sd(Age, na.rm=TRUE),
+        Min=min(Age, na.rm=TRUE),
+        Pct_25=quantile(Age, 0.25, na.rm=TRUE),
+        Median=median(Age, na.rm=TRUE),
+        Pct_75=quantile(Age, 0.75, na.rm=TRUE),
+        Max=max(Age, na.rm=TRUE),
+        IQR=quantile(Age, 0.75, na.rm=TRUE)-quantile(Age, 0.25, na.rm=TRUE),
+        Range=max(Age, na.rm=TRUE)-min(Age, na.rm=TRUE),
+    )
+)
+```
+Table 3. Numerical summary of age of pregnant individual at baseline
+
+### Preterm birth
+
+The fourth variable to analyze is preterm birth, which is coded categorically. As such, it is visualized in Figure 4 as a bar chart and described numerically in Table 4 using frequencies and relative frequencies of the categories. Out of the 823 total pregnancies in the study, 82 were preterm births (10.0%), 711 were not preterm (86.4%), and 30 were missing values (3.6%).
+
+```{r}
+ggplot(opt %>%
+    drop_na(Preterm),
+    aes(x=Preterm)
+) + geom_bar() + theme_classic() + ylab('Count')
+```
+Figure 4. Visualization of preterm birth
+
+```{r}
+kable(opt %>%
+    group_by(Preterm) %>%
+    summarize(Count=n()) %>%
+    mutate(Percent=Count/sum(Count)*100) %>%
+    adorn_totals()
+)
+```
+Table 4. Numerical summary of preterm birth
+
+### Maximum and minimum infant birthweight
+
+### Relationship between preterm birth and treatment group
+
+Figure 5. Visualization of relationship between preterm birth and treatment group
+```{r}
+ggplot(opt %>%
+    drop_na(Preterm) %>%
+    group_by(Preterm, Group) %>%
+    summarize(Count=n(), .groups='drop'),
+    aes(x=Group, y=Count, fill=Preterm)
+) + geom_bar(stat='identity', position='dodge') + theme_classic()
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Table 5. Numerical summary of relationship between preterm birth and treatment group
+```{r}
+kable(
+    xtabs(~ Group + Preterm, data=opt, addNA=TRUE) %>%
+    addmargins()
+)
+```
+
+### Relationship between preterm birth and age of pregnant individual
+
+Figure 6. Visualization of relationship between preterm birth and age of pregnant individual
+```{r}
+ggplot(opt %>%
+    drop_na(Preterm),
+    aes(x=Age, y=Preterm)
+) + geom_boxplot() + theme_classic()
+```
+
+Table 6. Numerical summary of relationship between preterm birth and age of pregnant individual
+
+```{r}
+kable(opt %>%
+    drop_na(Preterm) %>%
+    group_by(Preterm) %>%
+    summarize(
+        N=n(),
+        Mean=mean(Age, na.rm=TRUE),
+        SD=sd(Age, na.rm=TRUE),
+        Min=min(Age, na.rm=TRUE),
+        Pct_25=quantile(Age, 0.25, na.rm=TRUE),
+        Median=median(Age, na.rm=TRUE),
+        Pct_75=quantile(Age, 0.75, na.rm=TRUE),
+        Max=max(Age, na.rm=TRUE),
+        IQR=quantile(Age, 0.75, na.rm=TRUE)-quantile(Age, 0.25, na.rm=TRUE),
+        Range=max(Age, na.rm=TRUE)-min(Age, na.rm=TRUE),
+    )
+)
+```
+
+### Relationship between age of pregnant individual and infant birthweight
+
+Figure 7. Visualization of relationship between age of pregnant individual and infant birthweight
+```{r}
+ggplot(opt %>%
+    drop_na(Preterm),
+    aes(x=Age, y=Birthweight)
+) + geom_point(alpha=1/8) + theme_classic()
+```
+
+Table 7. Numerical description of relationship between age of pregnant individual and infant birthweight
+```{r}
+kable(opt[c('Age', 'Birthweight')] %>%
+    cor(use='complete.obs')
+)
+```
+
