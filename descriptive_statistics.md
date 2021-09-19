@@ -34,7 +34,7 @@ study description, there were 410 pregnant individuals in the control
 group (49.8%) and 413 in the treatment group (50.2%), amounting to a
 total of N=823.
 
-**Figure 1.** Visualization of treatment group
+**Figure 1.** Visualization of treatment group as bar chart
 
 ``` r
 ggplot(opt %>%
@@ -46,7 +46,8 @@ ggplot(opt %>%
 
 ![](descriptive_statistics_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
-**Table 1.** Numerical summary of treatment group
+**Table 1.** Numerical summary of treatment group as frequencies (Count)
+and relative frequencies (Percent)
 
 ``` r
 kable(opt %>%
@@ -76,7 +77,7 @@ estimate of central tendency than the mean, which is biased towards the
 low outliers. Furthermore, the standard deviation is 580 and the IQR is
 595.
 
-**Figure 2.** Visualization of infant birthweight
+**Figure 2.** Visualization of infant birthweight as histogram
 
 ``` r
 ggplot(opt %>%
@@ -89,7 +90,8 @@ ggplot(opt %>%
 
 ![](descriptive_statistics_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-**Table 2.** Numerical summary of infant birthweight
+**Table 2.** Numerical summary of infant birthweight using measures of
+center and spread
 
 ``` r
 kable(opt %>%
@@ -123,7 +125,8 @@ unimodal right-skewed distribution, which is also indicated by the mean
 (26) being greater than the median (25). In addition, the standard
 deviation of birthweight is 5.6 and the IQR is 8.
 
-**Figure 3.** Visualization of age of pregnant individual at baseline
+**Figure 3.** Visualization of age of pregnant individual at baseline as
+histogram
 
 ``` r
 ggplot(opt %>%
@@ -137,6 +140,7 @@ ggplot(opt %>%
 ![](descriptive_statistics_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 **Table 3.** Numerical summary of age of pregnant individual at baseline
+using measures of center and spread
 
 ``` r
 kable(opt %>%
@@ -168,7 +172,7 @@ frequencies of the categories. Out of the 823 total pregnancies in the
 study, 82 were preterm births (10.0%), 711 were not preterm (86.4%), and
 30 were missing values (3.6%).
 
-**Figure 4.** Visualization of preterm birth
+**Figure 4.** Visualization of preterm birth as bar chart
 
 ``` r
 ggplot(opt %>%
@@ -179,7 +183,8 @@ ggplot(opt %>%
 
 ![](descriptive_statistics_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-**Table 4.** Numerical summary of preterm birth
+**Table 4.** Numerical summary of preterm birth as frequencies (Count)
+and relative frequencies (Percent)
 
 ``` r
 kable(opt %>%
@@ -251,7 +256,7 @@ rates between the treatment groups, since the size of the treatment
 groups are slightly different.
 
 **Figure 5.** Visualization of relationship between preterm birth and
-treatment group
+treatment group using stacked bar charts of group proportions
 
 ``` r
 ggplot(opt %>%
@@ -265,7 +270,8 @@ ggplot(opt %>%
 ![](descriptive_statistics_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 **Table 6.** Numerical summary of relationship between preterm birth and
-treatment group
+treatment group using counts (N, Y, Total) and proportions (Pct_N,
+Pct_Y, Pct_total) of preterm births within each treatment group
 
 ``` r
 kable(opt %>%
@@ -309,7 +315,7 @@ side-by-side box plots in Figure 6, since this allows the medians and
 IQRs of the two distributions to be readily compared.
 
 **Figure 6.** Visualization of relationship between preterm birth and
-age of pregnant individual
+age of pregnant individual as side-by-side box plots
 
 ``` r
 ggplot(opt %>%
@@ -321,7 +327,8 @@ ggplot(opt %>%
 ![](descriptive_statistics_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 **Table 7.** Numerical summary of relationship between preterm birth and
-age of pregnant individual
+age of pregnant individual using measures of center and spread of the
+age distribution for those with or without preterm births
 
 ``` r
 kable(opt %>%
@@ -365,7 +372,7 @@ correlation between age and birthweight turned out to be just 0.04,
 indicating virtually no correlation.
 
 **Figure 7.** Visualization of relationship between age of pregnant
-individual and infant birthweight
+individual and infant birthweight as scatter plot
 
 ``` r
 ggplot(opt %>%
@@ -377,7 +384,7 @@ ggplot(opt %>%
 ![](descriptive_statistics_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 **Table 8.** Numerical description of relationship between age of
-pregnant individual and infant birthweight
+pregnant individual and infant birthweight using correlation
 
 ``` r
 kable(opt[c('Age', 'Birthweight')] %>%
