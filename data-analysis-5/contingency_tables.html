@@ -231,7 +231,7 @@ agg &lt;- lungcancer %&gt;%
     arrange(-count)
 
 agg$Population &lt;- c(75.6, 10.8, 9.1, 3.8, 0.7)
-agg$expected &lt;- round(agg$Population/100 * sum(agg$count), 0)
+agg$expected &lt;- round(agg$Population/100 * sum(agg$count), 2)
 
 agg %&gt;%
     adorn_totals() %&gt;%
@@ -278,7 +278,7 @@ White
 75.6
 </td>
 <td style="text-align:right;">
-3249
+3248.53
 </td>
 </tr>
 <tr>
@@ -295,7 +295,7 @@ Black
 10.8
 </td>
 <td style="text-align:right;">
-464
+464.08
 </td>
 </tr>
 <tr>
@@ -312,7 +312,7 @@ Hispanic
 9.1
 </td>
 <td style="text-align:right;">
-391
+391.03
 </td>
 </tr>
 <tr>
@@ -329,7 +329,7 @@ Asian
 3.8
 </td>
 <td style="text-align:right;">
-163
+163.29
 </td>
 </tr>
 <tr>
@@ -346,7 +346,7 @@ AmericanIn
 0.7
 </td>
 <td style="text-align:right;">
-30
+30.08
 </td>
 </tr>
 <tr>
@@ -363,7 +363,7 @@ Total
 100.0
 </td>
 <td style="text-align:right;">
-4297
+4297.01
 </td>
 </tr>
 </tbody>
@@ -400,7 +400,7 @@ chisq.test(x=agg$count, p=agg$Population/100)</code></pre>
 </div>
 <div id="mammography" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Mammography</h1>
-<p>The next question that we will investigate is whether there is a relationship between mammography experience and family history of breast cancer. A two-way table summarizing the relationship between these variables numerically is shown in Table 2. The relationship is shown graphically as stacked bar plots of relative frequencies in Figure 2.</p>
+<p>The next question that we will investigate is whether there is a relationship between mammography experience and family history of breast cancer. A contingency table summarizing the relationship between these variables numerically is shown in Table 2. The relationship is shown graphically as stacked bar plots of relative frequencies in Figure 2.</p>
 <pre class="r"><code>load(&#39;mamexp.RData&#39;)
 
 agg &lt;- mamexp %&gt;%
@@ -493,7 +493,7 @@ Total
 </tr>
 </tbody>
 </table>
-<p><strong>Table 2.</strong> Two-way table of counts summarizing relationship between mammography experience and family history of breast cancer.</p>
+<p><strong>Table 2.</strong> Contingency table of counts summarizing relationship between mammography experience and family history of breast cancer.</p>
 <pre class="r"><code>mamexp %&gt;%
     group_by(famhist, me) %&gt;%
     summarise(count=n()) %&gt;%
@@ -605,8 +605,8 @@ Total
 </tr>
 </tbody>
 </table>
-<p><strong>Table 3.</strong> Two-way table showing expected counts assuming that mammography experience and family history of breast cancer are independent.</p>
-<p>The design of this study probably involved a random sample of observational units (participants). Furthermore, it can be seen in Table 3 that every cell in the two-way table has a least 5 counts, assuming the null hypothesis is true. Therefore, the requirements are satisfied to apply a chi-squared test of independence, which we will now perform with significance level 0.10.</p>
+<p><strong>Table 3.</strong> Contingency table showing expected counts assuming that mammography experience and family history of breast cancer are independent.</p>
+<p>The design of this study probably involved a random sample of observational units (participants). Furthermore, it can be seen in Table 3 that every cell in the contingency table has a least 5 counts, assuming the null hypothesis is true. Therefore, the requirements are satisfied to apply a chi-squared test of independence, which we will now perform with significance level 0.10.</p>
 <pre class="r"><code>alpha = 0.10
 r = length(unique(mamexp$me))
 c = length(unique(mamexp$famhist))
@@ -618,14 +618,14 @@ chisq.test(x=table(mamexp$me, mamexp$famhist), correct=FALSE)</code></pre>
 ## X-squared = 13.05, df = 2, p-value = 0.001466</code></pre>
 <pre class="r"><code>qchisq(df=(r-1)*(c-1), p=1-alpha) # the critical value</code></pre>
 <pre><code>## [1] 4.60517</code></pre>
-<p>In this context, the chi-squared test statistic measures the disparity between the observed joint distribution and what would be expected if mammogram experience and family history of breast cancer were independent. At the significance level of 0.01, the critical value of 4.61 means that we would have a 10% probability of seeing test statistics greater than 4.61 if the variables were independent. The observed chi-squared test statistic is 13.05, which is larger than the critical value. Furthermore, the p-value of 0.0015 indicates that we would have a 0.15% chance of seeing a test statistic this large if the null hypothesis were true. Since the p-value is less than the significance level, we can reject the null hypothesis. In conclusion, we have strong evidence that mammography experience is dependent on family history of breast cancer.</p>
+<p>In this context, the chi-squared test statistic measures the disparity between the observed joint distribution and what would be expected if mammogram experience and family history of breast cancer were independent. At the significance level of 0.10, the critical value of 4.61 means that we would have a 10% probability of seeing test statistics greater than 4.61 if the variables were independent. The observed chi-squared test statistic is 13.05, which is larger than the critical value. Furthermore, the p-value of 0.0015 indicates that we would have a 0.15% chance of seeing a test statistic this large if the null hypothesis were true. Since the p-value is less than the significance level, we can reject the null hypothesis. In conclusion, we have strong evidence that mammography experience is dependent on family history of breast cancer.</p>
 <pre class="r"><code>p_me_fh = (11+19)/44                    # P(mam_exp|fam_hist)
 p_me_nfh = (63+85)/368                  # P(mam_exp|~fam_hist)
 odds_me_fh = p_me_fh / (1 - p_me_fh)    # Odds(mam_exp|fam_hist)
 odds_me_nfh = p_me_nfh / (1 - p_me_nfh) # Odds(mam_exp|~fam_hist)
 odds_me_fh / odds_me_nfh                # odds ratio</code></pre>
 <pre><code>## [1] 3.185328</code></pre>
-<p>The odds ratio of mammography experience for women with and without a family history of breast cancer is 3.19. This can be interpreted by saying that women with a family history of breast cancer have 3.19 higher odds of having had a mammogram than women with no family history of breast cancer.</p>
+<p>The odds ratio of mammography experience for women with and without a family history of breast cancer is 3.19. This can be interpreted by saying that women with a family history of breast cancer have 3.19 times greater odds of having had a mammogram than women with no family history of breast cancer.</p>
 </div>
 <div id="hip-protectors" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Hip Protectors</h1>
@@ -644,7 +644,7 @@ mcnemar.test(hip, correct=FALSE)</code></pre>
 ## 
 ## data:  hip
 ## McNemar&#39;s chi-squared = 1, df = 1, p-value = 0.3173</code></pre>
-<p>Here the chi-squared statistic of 1.0 represents the statistical distance between the probability of only having a fracture in the unprotected hip and the probability of only having a fracture in the protected hip. The p-value of 0.317 indicates that we would have a 31.7% chance of seeing a chi-squared test statistic this drastic if the null hypothesis were true. Since the p-value is less than the significance level of 0.05, we fail to reject the null hypothesis. There is insufficient evidence to conclude that the hip protectors were effective in preventing hip fractures in the elderly.</p>
+<p>Here the chi-squared statistic of 1.0 represents the statistical distance between the probability of only having a fracture in the unprotected hip and the probability of only having a fracture in the protected hip. The p-value of 0.317 indicates that we would have a 31.7% chance of seeing a chi-squared test statistic this drastic if the null hypothesis were true. Since the p-value is greater than the significance level of 0.05, we fail to reject the null hypothesis. There is insufficient evidence to conclude that the hip protectors were effective in preventing hip fractures in the elderly.</p>
 </div>
 
 

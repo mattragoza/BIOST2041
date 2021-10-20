@@ -27,7 +27,7 @@ agg <- lungcancer %>%
     arrange(-count)
 
 agg$Population <- c(75.6, 10.8, 9.1, 3.8, 0.7)
-agg$expected <- round(agg$Population/100 * sum(agg$count), 0)
+agg$expected <- round(agg$Population/100 * sum(agg$count), 2)
 
 agg %>%
     adorn_totals() %>%
@@ -76,7 +76,7 @@ White
 75.6
 </td>
 <td style="text-align:right;">
-3249
+3248.53
 </td>
 </tr>
 <tr>
@@ -93,7 +93,7 @@ Black
 10.8
 </td>
 <td style="text-align:right;">
-464
+464.08
 </td>
 </tr>
 <tr>
@@ -110,7 +110,7 @@ Hispanic
 9.1
 </td>
 <td style="text-align:right;">
-391
+391.03
 </td>
 </tr>
 <tr>
@@ -127,7 +127,7 @@ Asian
 3.8
 </td>
 <td style="text-align:right;">
-163
+163.29
 </td>
 </tr>
 <tr>
@@ -144,7 +144,7 @@ AmericanIn
 0.7
 </td>
 <td style="text-align:right;">
-30
+30.08
 </td>
 </tr>
 <tr>
@@ -161,7 +161,7 @@ Total
 100.0
 </td>
 <td style="text-align:right;">
-4297
+4297.01
 </td>
 </tr>
 </tbody>
@@ -248,7 +248,7 @@ population.
 
 The next question that we will investigate is whether there is a
 relationship between mammography experience and family history of breast
-cancer. A two-way table summarizing the relationship between these
+cancer. A contingency table summarizing the relationship between these
 variables numerically is shown in Table 2. The relationship is shown
 graphically as stacked bar plots of relative frequencies in Figure 2.
 
@@ -348,8 +348,8 @@ Total
 </tbody>
 </table>
 
-**Table 2.** Two-way table of counts summarizing relationship between
-mammography experience and family history of breast cancer.
+**Table 2.** Contingency table of counts summarizing relationship
+between mammography experience and family history of breast cancer.
 
 ``` r
 mamexp %>%
@@ -486,16 +486,16 @@ Total
 </tbody>
 </table>
 
-**Table 3.** Two-way table showing expected counts assuming that
+**Table 3.** Contingency table showing expected counts assuming that
 mammography experience and family history of breast cancer are
 independent.
 
 The design of this study probably involved a random sample of
 observational units (participants). Furthermore, it can be seen in Table
-3 that every cell in the two-way table has a least 5 counts, assuming
-the null hypothesis is true. Therefore, the requirements are satisfied
-to apply a chi-squared test of independence, which we will now perform
-with significance level 0.10.
+3 that every cell in the contingency table has a least 5 counts,
+assuming the null hypothesis is true. Therefore, the requirements are
+satisfied to apply a chi-squared test of independence, which we will now
+perform with significance level 0.10.
 
 ``` r
 alpha = 0.10
@@ -519,7 +519,7 @@ qchisq(df=(r-1)*(c-1), p=1-alpha) # the critical value
 In this context, the chi-squared test statistic measures the disparity
 between the observed joint distribution and what would be expected if
 mammogram experience and family history of breast cancer were
-independent. At the significance level of 0.01, the critical value of
+independent. At the significance level of 0.10, the critical value of
 4.61 means that we would have a 10% probability of seeing test
 statistics greater than 4.61 if the variables were independent. The
 observed chi-squared test statistic is 13.05, which is larger than the
@@ -542,8 +542,8 @@ odds_me_fh / odds_me_nfh                # odds ratio
 
 The odds ratio of mammography experience for women with and without a
 family history of breast cancer is 3.19. This can be interpreted by
-saying that women with a family history of breast cancer have 3.19
-higher odds of having had a mammogram than women with no family history
+saying that women with a family history of breast cancer have 3.19 times
+greater odds of having had a mammogram than women with no family history
 of breast cancer.
 
 # Hip Protectors
@@ -600,7 +600,7 @@ distance between the probability of only having a fracture in the
 unprotected hip and the probability of only having a fracture in the
 protected hip. The p-value of 0.317 indicates that we would have a 31.7%
 chance of seeing a chi-squared test statistic this drastic if the null
-hypothesis were true. Since the p-value is less than the significance
+hypothesis were true. Since the p-value is greater than the significance
 level of 0.05, we fail to reject the null hypothesis. There is
 insufficient evidence to conclude that the hip protectors were effective
 in preventing hip fractures in the elderly.
