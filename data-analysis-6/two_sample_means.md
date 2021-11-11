@@ -1,7 +1,7 @@
 M6 Data Analysis: Two sample means
 ================
 Matthew Ragoza
-10/27/2021
+11/11/2021
 
 -   [Change in headache severity](#change-in-headache-severity)
 -   [Effect of acupuncture therapy](#effect-of-acupuncture-therapy)
@@ -37,7 +37,7 @@ data %>%
         Q1=quantile(change, 0.25),
         Q2=quantile(change, 0.50),
         Q3=quantile(change, 0.75),
-        IQR=quantile(change, 0.75) - quantile(change, 0.25),
+        IQR=quantile(change, 0.75)-quantile(change, 0.25),
         min=min(change),
         max=max(change),
         range=max(change)-min(change)
@@ -140,13 +140,14 @@ data %>%
 **Figure 1.** Histogram of change in headache severity score from
 baseline to 1 year.
 
-It seems likely based on the distribution seen in Figure 1 that the mean
-headache severity decreased at 1 year compared to the baseline, but we
-can perform a test to evaluate this. The parameter we are interested in
-is the population mean change in headache severity score. The null
-hypothesis is that the population mean difference in headache severity
-is zero, and the alternative hypothesis is that the population mean
-difference in headache severity is less than zero.
+It seems likely based on the distribution seen in Figure 1 that there
+was a change in mean headache severity at 1 year compared to the
+baseline, but we can perform a test to evaluate this. The parameter we
+are interested in is the population mean change in headache severity
+score. The null hypothesis is that the population mean difference in
+headache severity is equal to zero, and the alternative hypothesis is
+that the population mean difference in headache severity is not equal to
+zero.
 
 Since we have two measurements from the same observational units
 (patients at two different points in time), we know that the two samples
@@ -159,7 +160,7 @@ satisfied. We can now perform the test using a significance level of
 
 ``` r
 alpha = 0.05
-t.test(data$change, na.rm=TRUE, alternative='less')
+t.test(data$change, na.rm=TRUE, alternative='two.sided')
 ```
 
     ## 
@@ -167,35 +168,36 @@ t.test(data$change, na.rm=TRUE, alternative='less')
     ## 
     ## data:  data$change
     ## t = -9.5042, df = 300, p-value < 2.2e-16
-    ## alternative hypothesis: true mean is less than 0
+    ## alternative hypothesis: true mean is not equal to 0
     ## 95 percent confidence interval:
-    ##       -Inf -5.360427
+    ##  -7.829550 -5.143429
     ## sample estimates:
     ## mean of x 
     ## -6.486489
 
 ``` r
-cat(sprintf('critical value = %f', qt(p=alpha, df=300)))
+cat(sprintf('critical value = %f', qt(p=1-alpha/2, df=300)))
 ```
 
-    ## critical value = -1.649949
+    ## critical value = 1.967903
 
 The t statistic indicates that the observed mean difference in headache
 severity is -9.5 standard errors from the null hypothesis value of 0.0.
 Given the significance level of 0.05, we would have a 5% chance of
-seeing a t statistic less than the critical value of -1.65 if the null
-hypothesis were true. The t statistic is much less than the critical
-value, and the p-value of 2.2e-16 means that we would have a vanishingly
-small probability of seeing a t statistic at least this low if the null
-hypothesis were true. Therefore, we reject the null hypothesis. We can
-interpret this as very strong evidence that the population mean headache
-severity score decreased from baseline to 1 year. The 95% confidence
-interval states that if we ran this experiment repeatedly, 95% of the
-time the true population mean difference in headache severity would be
-captured in the interval. Since the null hypothesis value of 0 is not
-contained in the one-sided confidence interval of (-Inf, -5.36), this is
-evidence that the headache severity score decreased from baseline to 1
-year in the population.
+seeing a t statistic more extreme than the critical value of 1.97 if the
+null hypothesis were true. The absolute value of the t statistic is much
+greater than the critical value, and the p-value of 2.2e-16 means that
+we would have a vanishingly small probability of seeing a t statistic at
+least this extreme if the null hypothesis were true. Therefore, we
+reject the null hypothesis. We can interpret this as very strong
+evidence that the population mean headache severity score changed from
+baseline to 1 year. The 95% confidence interval states that if we ran
+this experiment repeatedly, 95% of the time the true population mean
+difference in headache severity would be captured in the interval. Since
+the null hypothesis value of 0 is not contained in the confidence
+interval of (-7.83, -5.14), this is evidence that the headache severity
+score was different at 1 year compared to the baseline in the
+population.
 
 # Effect of acupuncture therapy
 
@@ -371,14 +373,14 @@ data %>%
 **Figure 2.** Side-by-side box plots of change in headache severity
 score for the treatment and control group.
 
-Given the differences in shape of the box plots in Figure 2, it is
-possible that there was a greater decrease in headache severity score
-for the treatment group that received acupuncture therapy. Since the
-measurements are from two independent samples, we could compare them
-using a two-sample t test. However, this test is performed differently
-depending on if the population variances are equal, so first we need to
-determine whether the samples are from populations with unequal variance
-before proceeding with the t test.
+Given the locations of the box plots in Figure 2, it is possible that
+there was a difference between the change in headache severity score for
+the treatment group that received acupuncture therapy and the control
+group that did not. Since the measurements are from two independent
+samples, we could compare them using a two-sample t test. However, this
+test is performed differently depending on if the population variances
+are equal, so first we need to determine whether the samples are from
+populations with unequal variance before proceeding with the t test.
 
 We can compare the variances of the two samples using an F test for
 homogeneity. The population parameter we will test is the ratio between
@@ -433,9 +435,9 @@ change in headache severity between the two groups. The parameter we
 will test is the difference in population mean change in headache
 severity between the treatment and control group. The null hypothesis is
 that there was no difference between the groups in the change in
-headache severity score, while the alternative hypothesis is that the
-change in headache severity score of the treatment group was less than
-that of the control group. We will assume two simple random samples
+headache severity score, while the alternative hypothesis is that there
+was a difference in the change in headache severity score between the
+treatment and control group. We will assume two simple random samples
 since the study is a randomized controlled trial, and the sample size of
 both the treatment and control group are greater than 30. However, we
 have demonstrated that the samples have *unequal* variance. Therefore we
@@ -445,40 +447,41 @@ unequal variance, which we will run at significance level 0.05.
 ``` r
 alpha = 0.05
 data$group2 <- factor(data$group, levels=c(1,0), labels=c('treatment', 'control'))
-t.test(data$change ~ data$group2, var.equal=FALSE, alternative='less')
+t.test(data$change ~ data$group2, var.equal=FALSE, alternative='two.sided')
 ```
 
     ## 
     ##  Welch Two Sample t-test
     ## 
     ## data:  data$change by data$group2
-    ## t = -2.9729, df = 297.94, p-value = 0.001596
-    ## alternative hypothesis: true difference in means is less than 0
+    ## t = -2.9729, df = 297.94, p-value = 0.003191
+    ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##       -Inf -1.763052
+    ##  -6.584790 -1.339278
     ## sample estimates:
     ## mean in group treatment   mean in group control 
     ##               -8.329296               -4.367262
 
 ``` r
-cat(sprintf('critical value = %f', qt(p=alpha, df=297.94)))
+cat(sprintf('critical value = %f', qt(p=1-alpha/2, df=297.94)))
 ```
 
-    ## critical value = -1.649984
+    ## critical value = 1.967958
 
 The t statistic of -2.97 means that the observed difference in sample
 means is almost 3 standard errors less than then null hypothesis value
 of 0. At a significance level of 0.05, the critical value indicates that
-we would have a 5% chance of seeing a test statistic of -1.65 or less if
-the null hypothesis were true. The test statistic value of -2.97 is less
-than the critical value, and the p-value means that we would only have a
-0.16% probability of getting a test statistic this low if the null
-hypothesis were true. Therefore, we reject the null hypothesis and have
-strong evidence that the headache severity score decreased more in the
-group that received acupuncture therapy than in the group that did not.
+we would have a 5% chance of seeing a test statistic with an absolute
+value of 1.97 or more if the null hypothesis were true. The test
+statistic value of -2.97 is beyond the critical value, and the p-value
+means that we would only have a 0.32% probability of getting a test
+statistic at least this extreme if the null hypothesis were true.
+Therefore, we reject the null hypothesis and have strong evidence that
+there was a difference in the change in headache severity score between
+the group that received acupuncture therapy and the group that did not.
 The 95% confidence interval means that in repeated samples, 95% of the
 constructed intervals would contain the true difference in population
-means between the groups. The one-sided confidence interval of (-Inf,
--1.76) does not contain the null hypothesis value of 0.0, so it supports
-the conclusion that the headache severity score decreased by more in the
-treatment group than in the control group.
+means between the groups. The confidence interval of (-6.58, -1.34) does
+not contain the null hypothesis value of 0.0, so it supports the
+conclusion that the change in headache severity score was different
+between the treatment and control groups.
