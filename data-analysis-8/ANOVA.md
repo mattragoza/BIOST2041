@@ -351,11 +351,11 @@ test scores from each other.
 
 # Writing test scores
 
-The second research question that would like to investigate is whether
-there is a difference in average writing test scores for students in
-different academic program types and who have different socioeconomic
-status (SES). If there are any differences, we would like to
-characterize them as best as we can. We can begin with the numerical
+The second research question that we would like to investigate is
+whether there is a difference in average writing test scores for
+students in different academic program types and who have different
+socioeconomic status (SES). If there are any differences, we would like
+to characterize them as best as we can. We can begin with the numerical
 summary shown in Table 2, which displays measures of center and spread
 for writing test scores split by academic program type and SES. The
 group with the highest mean writing score of 57.3 was students of high
@@ -869,5 +869,100 @@ Moving on to the main effect of SES on writing test scores, the p-value
 implies that we would have a 16.2% chance of seeing a test statistic
 this large if the null hypothesis were true. At our 5% significance
 level, we do not reject the null hypothesis. Therefore, we do not have
-evidence that there is a difference in mean writing test scores betweeen
+evidence that there is a difference in mean writing test scores between
 students from different SES backgrounds.
+
+We have discovered a significant main effect of program type on mean
+writing test scores, but no main effect from SES and no interaction
+effect between program and SES. We will now investigate the main effect
+of program type on writing scores further through post-hoc analysis. The
+goal of this analysis will be to determine which pairs of the academic
+program types have different mean writing test scores. We can perform
+two-sample Student’s t-tests on mean writing scores for each pair of
+program types. We will again apply the Bonferroni correction to maintain
+the overall typer I error rate at our 5% significance level.
+
+We will now run two-sample t-tests using each pair of academic program
+types to determine which of them have different mean writing test
+scores. For each post-hoc test, the null hypothesis is that the mean
+writing test scores are the same, while the alternative hypothesis is
+that they are different.The conditions for the two-sample t tests are
+met by virtue of the fact that they are the same conditions that are
+required for ANOVA, which we have already satisfied. We will now run the
+post-hoc analysis using an overall Bonferroni-correct significance level
+of 0.05.
+
+``` r
+# post hoc analysis
+model1.emm <- emmeans(
+    model1.formula,
+    pairwise ~ program,
+    adjust="bonferroni"
+)
+```
+
+    ## NOTE: Results may be misleading due to involvement in interactions
+
+``` r
+model1.emm
+```
+
+    ## $emmeans
+    ##  program  emmean    SE  df lower.CL upper.CL
+    ##  academic   55.8 0.907 191     54.0     57.6
+    ##  general    52.0 1.362 191     49.3     54.7
+    ##  vocation   46.8 1.465 191     43.9     49.7
+    ## 
+    ## Results are averaged over the levels of: SES 
+    ## Confidence level used: 0.95 
+    ## 
+    ## $contrasts
+    ##  contrast            estimate   SE  df t.ratio p.value
+    ##  academic - general      3.76 1.64 191   2.300  0.0677
+    ##  academic - vocation     8.96 1.72 191   5.201  <.0001
+    ##  general - vocation      5.20 2.00 191   2.598  0.0304
+    ## 
+    ## Results are averaged over the levels of: SES 
+    ## P value adjustment: bonferroni method for 3 tests
+
+The post-hoc tests have given us a p-value for the difference in mean
+writing test scores for each pair of academic program types. The p-value
+for the (academic, general) pair was not below the significance level of
+5%, so we do not have evidence of a difference in mean writing test
+scores between academic and general programs. The p-value for the
+(academic, vocation) pair implies that we have less than 0.01% chance of
+obtaining a test statistic this extreme under the null hypothesis.
+Furthermore, the p-value for the (general, vocation) means that we would
+have a 3.04% chance of getting this extreme a result under the null
+hypothesis. These second two p-values are below the significance level,
+so we can reject two out of the three post-hoc null hypotheses. In
+conclusion, we have evidence that there is a difference in mean writing
+test scores between academic and vocational programs and between general
+and vocational programs, but not between academic and general programs.
+
+``` r
+# simultaneous confidence intervals
+model1.ci <- confint(
+    model1.emm, adjust='bonferroni'
+)$emmeans
+plot(model1.ci, ylab='Academic program type', xlab='Writing test score')
+```
+
+![](ANOVA_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+**Figure 4.** 98.3% confidence intervals for writing test scores by
+academic program type.
+
+Here we have constructed Bonferroni-corrected simultaneous confidence
+intervals for mean writing score by academic program type. We use 98.3%
+confidence intervals for each group mean, which are shown in Figure 3,
+to account for the number of post-hoc tests that we ran. In repeated
+samples, 98.3% of the confidence intervals would contain the true
+population mean of writing test scores. Somewhat surprisingly, none of
+the group mean writing test scores are within the confidence intervals
+of any other group means. This is counter to the result of the post-hoc
+analysis, which implied that the mean writing test scores for academic
+and general program types might be the same. The mean writing score for
+the vocational programs is not contained within the confidence intervals
+for the other two programs, which is a result that is in agreement with
+the post-hoc analysis.
